@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Enter Your Daily Data</title>
+<style>
+body { font-family: Arial; background:#f4f9ff; margin:0; }
+header { background:#4f7cff; color:white; text-align:center; padding:20px; font-size:22px; position:relative; }
+.nav { position:absolute; top:20px; right:20px; cursor:pointer; font-size:24px; }
+.nav-content { display:none; position:absolute; right:0; background:white; box-shadow:0 4px 10px rgba(0,0,0,0.2); border-radius:10px; overflow:hidden; }
+.nav-content a { display:block; padding:10px 15px; color:#333; text-decoration:none; }
+.nav-content a:hover { background:#f0f0f0; }
+.container { background:white; width:90%; max-width:400px; margin:80px auto 30px; padding:20px; border-radius:15px; box-shadow:0 5px 10px rgba(0,0,0,0.1); }
+label { display:block; margin-top:15px; font-weight:bold; }
+input { width:100%; padding:10px; margin-top:5px; border-radius:10px; border:1px solid #ccc; }
+.buttons { display:flex; gap:10px; margin-top:25px; }
+button { flex:1; padding:12px; border:none; border-radius:10px; font-size:16px; cursor:pointer; }
+.save { background:#4f7cff; color:white; }
+.reset { background:#e0e0e0; }
+body.dark{
+  background:#121212;
+  color:white;
+}
+</style>
+</head>
+<body>
+
+<header>
+  Enter Your Daily Data
+  <div class="nav" onclick="toggleNav()">⋮</div>
+  <div class="nav-content" id="navMenu">
+    <a href="data.html">Data</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="comparison.html">Comparison</a>
+    <a href="assistant.html">AI Assistant</a>
+    <a href="settings.html">Settings</a>
+  </div>
+</header>
+
+<div class="container">
+<form>
+<label>Sleep (hours)</label>
+<input type="number" id="sleep" placeholder="e.g. 7">
+
+<label>Water Intake (liters)</label>
+<input type="number" step="0.1" id="water" placeholder="e.g. 2">
+
+<label>Exercise (minutes)</label>
+<input type="number" id="exercise" placeholder="e.g. 30">
+
+<label>Calories</label>
+<input type="number" id="calories" placeholder="Enter calories">
+
+<label>Mood (0-100)</label>
+<input type="number" id="mood" placeholder="e.g. 80">
+
+<label>Focus (0-100)</label>
+<input type="number" id="focus" placeholder="e.g. 70">
+
+<label>Energy (0-100)</label>
+<input type="number" id="energy" placeholder="e.g. 75">
+
+<label>Stress (0-100)</label>
+<input type="number" id="stress" placeholder="e.g. 40">
+
+<label>Screen Time (hours)</label>
+<input type="number" id="screenTime" placeholder="e.g. 3">
+
+<div class="buttons">
+<button type="button" class="save" onclick="saveData()">Save Data</button>
+<button type="reset" class="reset">Reset</button>
+</div>
+</form>
+</div>
+
+<script>
+function toggleNav(){ 
+  let menu = document.getElementById("navMenu");
+  menu.style.display = menu.style.display==="block"?"none":"block"; 
+}
+
+function saveData() {
+  ["sleep","water","exercise","calories","mood","focus","energy","stress","screenTime"].forEach(k=>{
+    localStorage.setItem("y_"+k, localStorage.getItem(k));
+    localStorage.setItem(k, document.getElementById(k).value);
+  });
+
+  let sleep=num("sleep"), water=num("water"), exercise=num("exercise"),
+      mood=num("mood"), focus=num("focus"), energy=num("energy"),
+      stress=num("stress"), screen=num("screenTime"), calories=num("calories");
+
+  let score = sleep*10 + water*10 + exercise*2 + mood*0.5 + focus*0.5 + energy*0.5 - stress*0.5 - screen*2 - calories/50;
+  localStorage.setItem("healthScore", Math.round(score));
+
+  let insight="Keep tracking!";
+  if(sleep<6) insight="Try to sleep more 💤";
+  else if(water<2) insight="Drink more water 💧";
+  else if(screen>5) insight="Reduce screen time 📱";
+  else if(stress>60) insight="Relax, stress is high 😌";
+  localStorage.setItem("insight", insight);
+
+  function pushArr(key,value){
+    let arr=JSON.parse(localStorage.getItem(key)||"[]");
+    arr.push(Number(value));
+    localStorage.setItem(key,JSON.stringify(arr));
+  }
+
+  ["sleep","water","exercise","calories","mood","focus","energy","stress","screenTime"].forEach(k=>{
+    pushArr("week_"+k, document.getElementById(k).value);
+    pushArr("month_"+k, document.getElementById(k).value);
+  });
+
+  window.location.href="dashboard.html";
+}
+function num(k){return Number(localStorage.getItem(k))||0;}
+
+</script>src="app.js"></script>
+
+</body>
+</html>

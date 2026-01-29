@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Health Dashboard</title>
+
+<style>
+body{font-family:Arial;background:#f4f6fb;padding:20px;margin:0;}
+h1,h2{text-align:center;}
+
+header{
+  background:#4f7cff;
+  color:white;
+  padding:20px;
+  position:relative;
+  text-align:center;
+  font-size:22px;
+}
+
+.nav{
+  position:absolute;
+  top:20px;
+  right:20px;
+  cursor:pointer;
+  font-size:24px;
+}
+
+.nav-content{
+  display:none;
+  position:absolute;
+  right:20px;
+  top:60px;
+  background:white;
+  box-shadow:0 4px 10px rgba(0,0,0,0.2);
+  border-radius:10px;
+  overflow:hidden;
+  z-index:10;
+}
+
+.nav-content a{
+  display:block;
+  padding:10px 15px;
+  color:#333;
+  text-decoration:none;
+}
+
+.nav-content a:hover{background:#f0f0f0;}
+
+.card{
+  background:white;
+  max-width:550px;
+  margin:20px auto;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+.row{display:flex;justify-content:space-between;margin:8px 0;}
+.good{color:green;font-weight:bold;}
+.bad{color:red;font-weight:bold;}
+.neutral{color:gray;}
+.score{font-size:40px;text-align:center;color:#4f7cff;}
+</style>
+</head>
+
+<body>
+
+<header>
+  Health Dashboard
+  <div class="nav" onclick="toggleNav()">⋮</div>
+  <div class="nav-content" id="navMenu">
+    <a href="data.html">Data</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="comparison.html">Comparison</a>
+    <a href="assistant.html">AI Assistant</a>
+    <a href="settings.html">Settings</a>
+  </div>
+</header>
+
+<div class="card">
+  <h2>Today's Report</h2>
+  <div class="score" id="score"></div>
+  <p id="insight"></p>
+</div>
+
+<div class="card">
+  <h2>Today vs Yesterday</h2>
+  <div id="dailyCompare"></div>
+</div>
+
+<div class="card">
+  <h2>Weekly Report</h2>
+  <div id="weeklyReport"></div>
+</div>
+
+<div class="card">
+  <h2>Monthly Report</h2>
+  <div id="monthlyReport"></div>
+</div>
+
+<script>
+function toggleNav(){
+  let menu=document.getElementById("navMenu");
+  menu.style.display = menu.style.display==="block" ? "none" : "block";
+}
+
+const metrics=[
+{key:"sleep",label:"Sleep",reverse:false},
+{key:"water",label:"Water",reverse:false},
+{key:"exercise",label:"Exercise",reverse:false},
+{key:"calories",label:"Calories",reverse:true},
+{key:"mood",label:"Mood",reverse:false},
+{key:"focus",label:"Focus",reverse:false},
+{key:"energy",label:"Energy",reverse:false},
+{key:"stress",label:"Stress",reverse:true},
+{key:"screenTime",label:"Screen Time",reverse:true}
+];
+
+const num=k=>Number(localStorage.getItem(k))||0;
+
+document.getElementById("score").innerText=num("healthScore")+"/100";
+document.getElementById("insight").innerText=localStorage.getItem("insight")||"No insights";
+
+function compare(a,b,reverse){
+  if(a===b)return`<span class="neutral">Same</span>`;
+  if(!reverse) return a>b?`<span class="good">Better</span>`:`<span class="bad">Worse</span>`;
+  return a<b?`<span class="good">Better</span>`:`<span class="bad">Worse</span>`;
+}
+
+let dailyHTML="";
+metrics.forEach(m=>{
+  dailyHTML+=`<div class="row"><div>${m.label}</div><div>${compare(num(m.key),num("y_"+m.key),m.reverse)}</div></div>`;
+});
+document.getElementById("dailyCompare").innerHTML=dailyHTML;
+
+function avg(arr){return arr.length?arr.reduce((a,b)=>a+b,0)/arr.length:0;}
+
+function buildReport(type,targetId){
+  let html="";
+  metrics.forEach(m=>{
+    let arr=JSON.parse(localStorage.getItem(type+"_"+m.key)||"[]");
+    html+=`<div class="row"><div>${m.label}</div><div>${avg(arr).toFixed(1)}</div></div>`;
+  });
+  document.getElementById(targetId).innerHTML=html;
+}
+
+buildReport("week","weeklyReport");
+buildReport("month","monthlyReport");
+</script>
+
+</body>
+</html>

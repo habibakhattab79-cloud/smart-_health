@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Settings</title>
+<style>
+body{
+  font-family:Arial;
+  padding:20px;
+}
+.setting{
+  margin-bottom:20px;
+}
+
+body.dark{
+  background:#121212;
+  color:white;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<h2>Settings</h2>
+
+<div class="setting">
+  <label>
+    Dark Mode
+    <input type="checkbox" id="darkToggle">
+  </label>
+</div>
+
+<div class="setting">
+  <label>Language:</label>
+  <select id="language">
+    <option value="en">English</option>
+    <option value="ar">Arabic</option>
+  </select>
+</div>
+
+<div class="setting">
+  <label>
+    Notifications
+    <input type="checkbox" id="notify">
+  </label>
+</div>
+
+<div class="setting">
+  <label>
+    Camera Access
+    <input type="checkbox" id="camera">
+  </label>
+</div>
+
+<script>
+/* تحميل القيم */
+document.getElementById("darkToggle").checked =
+  localStorage.getItem("theme")==="dark";
+
+document.getElementById("language").value =
+  localStorage.getItem("language") || "en";
+
+document.getElementById("notify").checked =
+  localStorage.getItem("notifications")==="true";
+
+document.getElementById("camera").checked =
+  localStorage.getItem("camera")==="true";
+
+/* حفظ القيم */
+document.getElementById("darkToggle").onchange = e=>{
+  localStorage.setItem("theme", e.target.checked?"dark":"light");
+};
+
+document.getElementById("language").onchange = e=>{
+  localStorage.setItem("language", e.target.value);
+};
+
+document.getElementById("notify").onchange = e=>{
+  localStorage.setItem("notifications", e.target.checked);
+};
+
+document.getElementById("camera").onchange = e=>{
+  localStorage.setItem("camera", e.target.checked);
+};
+</script>
+
+</body>
+</html>
